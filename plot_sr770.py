@@ -23,12 +23,12 @@ def plot_sr770(csv_path_in):
     sr770_data_1 = pd.read_csv(csv_path, index_col=False, names=['Frequency', 'Voltage'])
     print(sr770_data_1.head())
 
-    sr770_data_2 = pd.read_csv(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\1', index_col=False, names=['Frequency', 'Voltage'])
+    sr770_data_2 = pd.read_csv(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\sr770_ting', index_col=False, names=['Frequency', 'Voltage'])
 
     fig, ax = plt.subplots()
 
-    ax.plot(sr770_data_1['Frequency'], sr770_data_1['Voltage'], linestyle='-', label='Yes T')
-    ax.plot(sr770_data_2['Frequency'], sr770_data_2['Voltage'], linestyle='-', label='No T')
+    ax.plot(sr770_data_1['Frequency'], sr770_data_1['Voltage'], linestyle='-', label='No T\'ing')
+    ax.plot(sr770_data_2['Frequency'], sr770_data_2['Voltage'], linestyle='-', label='With T\'ing')
 
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Voltage (V)')
@@ -39,4 +39,4 @@ def plot_sr770(csv_path_in):
     plt.show()
 
 if __name__ == '__main__':
-    plot_sr770(csv_path_in=r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\2')
+    plot_sr770(csv_path_in=r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\sr770_direct')

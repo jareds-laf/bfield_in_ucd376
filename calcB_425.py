@@ -106,7 +106,7 @@ def plot_425():
         "axes.edgecolor": 'black',
         "axes.linewidth": 0.75
     }
-
+    
     plt.rcParams.update(custom_params)
 
     """Plot data
