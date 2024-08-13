@@ -18,7 +18,7 @@ def find_nearest(array, value):
 # csv_path_in1 = r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\240812-1'
 # csv_path_in2 = r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\sr770_direct'
 # csv_path_in3 = r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\sr770_direct'
-csv_path_in_ac = r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\SR770\240812-1'
+csv_path_in_ac = r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\MS024\005\ACBGNS'
 
 
 # if csv_path_in1:

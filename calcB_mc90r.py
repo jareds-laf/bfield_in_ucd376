@@ -74,20 +74,6 @@ def calcB_mc90r(csv_path_in, channel=4):
     # scope_data.to_csv(output_file_path, index=False, header=False)
     # print(f'Data saved to {output_file_path}')
 
-def plot_mc90r():
-    # Plot the B (T) vs. Time (s) oscilloscope data
-    custom_params = {"axes.spines.left": True, "axes.spines.bottom": True,\
-                    "axes.spines.right": False, "axes.spines.top": False,\
-                    "grid.linestyle": '-',\
-                    "grid.alpha": 0.5,\
-                    "grid.linewidth": 0.5,\
-                    "grid.color": 'black',\
-                    "axes.edgecolor": 'black',\
-                    "axes.linewidth": 0.75}
-    
-    sns.set_theme(style="whitegrid", rc=custom_params)
-    sns.relplot(data=scope_data, x='Time (s)', y='B (T)', kind='line')
-
 if __name__ == '__main__':
     calcB_mc90r(csv_path_in=r'G:\My Drive\Other\REUs\Summer 2024\UCD\Scope Data\MS024\001\tektest_000_ALL.csv', channel=1)
     # calcB_mc90r(csv_path_in='', channel=1)
