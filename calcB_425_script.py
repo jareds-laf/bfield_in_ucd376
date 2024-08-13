@@ -110,7 +110,24 @@ I'm assuming here that channel 1 is the x-axis, channel 2 is the y-axis,
  channel 3 is the z-axis (x, y, and z for the DC fields), and channel 4 is the
 AC field.
 """
+
+B1_mean = np.mean(scope_data1['B1'])
+B2_mean = np.mean(scope_data1['B2'])
+B3_mean = np.mean(scope_data1['B3'])
+
+norm = np.sqrt(B1_mean**2 + B2_mean**2 + B3_mean**2)
+print()
+print()
+print(B1_mean, B2_mean, B3_mean, norm)
+
 fig, ax = plt.subplots()
+
+
+ax.axhline(y=B1_mean, color='orange', linestyle='--', label=r'$\langle B_{DC,x} \rangle$')
+ax.axhline(y=B2_mean, color='blue', linestyle='--', label=r'$\langle B_{DC,y} \rangle$')
+ax.axhline(y=B3_mean, color='red', linestyle='--', label=r'$\langle B_{DC,z} \rangle$')
+ax.axhline(y=norm, color='black', linestyle='--', label=r'$\langle B_{DC} \rangle$')
+
 # Plot DC field data
 ax.plot(scope_data1['t'], scope_data1['B1'], label=r'$B_{DC,x}$', color='orange')
 ax.plot(scope_data1['t'], scope_data1['B2'], label=r'$B_{DC,y}$', color='blue')
@@ -141,6 +158,7 @@ ax.set_ylabel('B (T)')
 ax.grid(True, which='both')
 ax.legend()
 plt.show()
+
 
 # output_file_path = normalize_path(f'{os.path.dirname(csv_path_1)}/plot_b_{os.path.basename(csv_path_1)[:-4]}.png')
 # fig.savefig(output_file_path, format='png')#, dpi=300, bbox_inches='tight')
