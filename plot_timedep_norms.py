@@ -5,7 +5,14 @@ import numpy as np
 import glob
 from tkinter import filedialog
 
-time_averaged = True
+# time_averaged tells the script whether or not you want to plot the
+# time-dependent data or the time-averaged data
+time_averaged = False
+
+# norms_present tells the script whether the data has norms already calculated
+# by the scope (2), if the data has norms manually calculated (1), or if the
+# data has no norms (0)
+norms_present = 1
 
 def normalize_path(in_path):
     # A quick function to ensure that any input paths are properly referenced
@@ -17,10 +24,20 @@ def find_nearest(array, value):
     return array[idx]
 
 
-# Read in the norms
-files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\008\norms_Tek001_*_ALL.csv')
-data = []
+# Read in the data
 
+if norms_present == 2:
+    #TODO: Add the correct path to aug23
+    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\aug23\norms_Tek001_*_ALL.csv')
+elif norms_present == 1:
+    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\008\norms_Tek001_*_ALL.csv')
+elif norms_present == 0:
+    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\007\Tek001_*_ALL.csv')
+else:
+    print('Invalid norms_present value. Please enter 0, 1, or 2.')
+
+
+data = []    
 for i in files:
     if i:
         print(i)
@@ -31,6 +48,21 @@ for i in files:
 # print(data[0])
 
 # print(data[0]['Norm (B)'].head())
+
+
+
+# norms_present tells the script whether the data has norms already calculated
+# by the scope (2), if the data has norms manually calculated (1), or if the
+# data has no norms (0)
+if norms_present == 2:
+    data[0]['Norm (B)'] = data[0]['Norm (B)'] * 1e-6
+    pass
+elif norms_present == 1:
+    pass
+elif norms_present == 0:
+    pass
+
+
 
 custom_params = {
     "axes.spines.left": True,
