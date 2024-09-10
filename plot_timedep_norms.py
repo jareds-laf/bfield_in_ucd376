@@ -5,7 +5,7 @@ import numpy as np
 import glob
 from tkinter import filedialog
 
-time_averaged = False
+time_averaged = True
 
 def normalize_path(in_path):
     # A quick function to ensure that any input paths are properly referenced
@@ -24,7 +24,9 @@ data = []
 for i in files:
     if i:
         print(i)
-    data.append(pd.read_csv(i,sep='\t',skiprows=1,names=['TIME', 'CH1', 'CH2', 'CH3', 'CH4', 'Norm (V)', 'Norm (B)']))
+    data.append(pd.read_csv(i))
+
+    # names=['TIME', 'CH1', 'CH2', 'CH3', 'CH4', 'Norm (V)', 'Norm (B)']
 
 # print(data[0])
 
@@ -78,8 +80,8 @@ else:
     ax.set_title('Room 376B Background DC Magnetic Field Norms\n')
     ax.set_ylabel(r'Norm($\vec{B}$) ($\mu$T)')    
     ax.set_xlabel('Time (s)')
+    ax.legend()
 
-ax.legend()
 fig.set_size_inches(6, 4)
 ax.grid(True, which='major')
 
