@@ -14,6 +14,11 @@ time_averaged = False
 # data has no norms (0)
 norms_present = 1
 
+# Value for the shunt resistor (R1) on the DRV425EVM
+R_shunt = 1000
+
+import pandas as pd
+
 def normalize_path(in_path):
     # A quick function to ensure that any input paths are properly referenced
     return os.path.normpath(os.path.realpath(os.path.expanduser(in_path)))
@@ -23,44 +28,62 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
+def convert_to_float(x):
+    try:
+        return float(x)
+    except ValueError:
+        return x  # In case some values can't be converted
 
 # Read in the data
-
+data = []    
 if norms_present == 2:
     #TODO: Add the correct path to aug23
-    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\aug23\norms_Tek001_*_ALL.csv')
+    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\aug23\lights376outsideoff_ALL.csv')
+    for i in files:
+        if i:
+            print(i)
+        data.append(pd.read_csv(i, skiprows=13, names=['TIME1', 'CH1', 'CH2', 'CH3', 'CH4', 'untitled', 'TIME2', 'Norm (V)']))
+
+    for i in data:
+        # Convert norm to Teslas using the formula found in the datasheet for
+        # the DRV425EVM
+        norm_b = i['Norm (V)'] / (12.2 * 4 * R_shunt)
+
+        i.insert(5, 'Norm (B)', norm_b)
+
+        i.head()
 elif norms_present == 1:
     files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\008\norms_Tek001_*_ALL.csv')
+    for i in files:
+        if i:
+            print(i)
+        data.append(pd.read_csv(i))
 elif norms_present == 0:
-    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\007\Tek001_*_ALL.csv')
+    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\007\Tek000_*_ALL.csv')
+    for i in files:
+        if i:
+            print(i)
+        data.append(pd.read_csv(i, skiprows=13,low_memory=False))#, converters={'TIME': convert_to_float, 'CH1': convert_to_float, 'CH2': convert_to_float, 'CH3': convert_to_float, 'CH4': convert_to_float}))
+
+    for i in data:
+        pd.to_numeric(i['TIME'], errors='coerce')
+
+        # Calculate the norm in Volts
+        norm_v = np.sqrt(i['CH1']**2 + i['CH2']**2 + i['CH3']**3)
+
+        # Convert norm to Teslas using the formula found in the datasheet for
+        # the DRV425EVM
+        norm_b = norm_v / (12.2 * 4 * R_shunt)
+
+        i.insert(5, 'Norm (V)', norm_v)
+        i.insert(6, 'Norm (B)', norm_b)
+
+        print(i.head(2))
+
 else:
     print('Invalid norms_present value. Please enter 0, 1, or 2.')
 
-
-data = []    
-for i in files:
-    if i:
-        print(i)
-    data.append(pd.read_csv(i))
-
-    # names=['TIME', 'CH1', 'CH2', 'CH3', 'CH4', 'Norm (V)', 'Norm (B)']
-
-# print(data[0])
-
 # print(data[0]['Norm (B)'].head())
-
-
-
-# norms_present tells the script whether the data has norms already calculated
-# by the scope (2), if the data has norms manually calculated (1), or if the
-# data has no norms (0)
-if norms_present == 2:
-    data[0]['Norm (B)'] = data[0]['Norm (B)'] * 1e-6
-    pass
-elif norms_present == 1:
-    pass
-elif norms_present == 0:
-    pass
 
 
 
