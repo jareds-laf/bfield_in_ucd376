@@ -4,6 +4,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 import glob
 from tkinter import filedialog
+from scipy import signal
+
+# Make plots pretty
+custom_params = {
+    "axes.spines.left": True,
+    "axes.spines.bottom": True,
+    "axes.spines.right": True,
+    "axes.spines.top": True,
+    "grid.linestyle": '--',
+    "grid.alpha": 0.5,
+    "grid.linewidth": 0.7,
+    "grid.color": 'black',
+    "axes.edgecolor": 'black',
+    "axes.linewidth": 0.75,
+    # "font.family": 'Times New Roman',
+    "font.size": 12.0
+}
+
+plt.rcParams.update(custom_params)
+bar_colors = ['#062bb4', '#2822d4', '#822ee8', '#d96ae0', '#ee94a7', '#fcc2cf']
+
 
 # time_averaged tells the script whether or not you want to plot the
 # time-dependent data or the time-averaged data
@@ -12,7 +33,7 @@ time_averaged = False
 # norms_present tells the script whether the data has norms already calculated
 # by the scope (2), if the data has norms manually calculated (1), or if the
 # data has no norms (0)
-norms_present = 1
+norms_present = 0
 
 # Value for the shunt resistor (R1) on the DRV425EVM
 R_shunt = 1000
@@ -59,12 +80,13 @@ elif norms_present == 1:
             print(i)
         data.append(pd.read_csv(i))
 elif norms_present == 0:
-    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\007\Tek000_*_ALL.csv')
+    files = glob.glob(r'G:\My Drive\Other\REUs\Summer 2024\UCD\Data\sep9-sep11\*_ALL.csv')
     for i in files:
         if i:
             print(i)
         data.append(pd.read_csv(i, skiprows=13,low_memory=False))#, converters={'TIME': convert_to_float, 'CH1': convert_to_float, 'CH2': convert_to_float, 'CH3': convert_to_float, 'CH4': convert_to_float}))
 
+    # Calculate B field norms
     for i in data:
         pd.to_numeric(i['TIME'], errors='coerce')
 
@@ -80,34 +102,50 @@ elif norms_present == 0:
 
         print(i.head(2))
 
+    # Perform a DFT using scipy.welch
+    # Use if you don't have spectrum analyzer data
+    spectra = []
+    for i, dataset in enumerate(data):
+        pd.to_numeric(dataset['TIME'], errors='coerce')
+
+        # 4e-5 s/sample = 25 kHz
+        fs = 25000
+
+        # Overlap = ~10%
+        noverlap = 0.1 * len(dataset['TIME'])
+
+        # 0.5s segments --> 0.5s / (4e-5 s/sample) = nperseg
+        nperseg = 0.5/(4e-5)
+
+        f, Pxx_den = signal.welch(dataset['Norm (B)'], fs=fs, nperseg=nperseg, noverlap=None)
+
+        if i == 0:
+            spectra.append(f)
+            spectra.append(np.sqrt(Pxx_den))
+        else:
+            spectra.append(np.sqrt(Pxx_den))
+
 else:
     print('Invalid norms_present value. Please enter 0, 1, or 2.')
 
 # print(data[0]['Norm (B)'].head())
 
-
-
-custom_params = {
-    "axes.spines.left": True,
-    "axes.spines.bottom": True,
-    "axes.spines.right": True,
-    "axes.spines.top": True,
-    "grid.linestyle": '--',
-    "grid.alpha": 0.5,
-    "grid.linewidth": 0.7,
-    "grid.color": 'black',
-    "axes.edgecolor": 'black',
-    "axes.linewidth": 0.75,
-    # "font.family": 'Times New Roman',
-    "font.size": 12.0
-}
-
-plt.rcParams.update(custom_params)
-
 # Plot data
 fig, ax = plt.subplots()
 
-bar_colors = ['#062bb4', '#2822d4', '#822ee8', '#d96ae0', '#ee94a7', '#fcc2cf']
+# Plot spectra
+ax.plot(spectra[0], spectra[1], color=bar_colors[0], linestyle='-', label='lightsOff1209')
+ax.plot(spectra[0], spectra[2], color=bar_colors[1], linestyle='-', label='lightsOn1209')
+ax.plot(spectra[0], spectra[3], color=bar_colors[2], linestyle='-', label='lightsOff376')
+ax.plot(spectra[0], spectra[4], color=bar_colors[3], linestyle='-', label='376poweroff')
+ax.plot(spectra[0], spectra[5], color=bar_colors[4], linestyle='-', label='lightsOn376')
+
+ax.legend()
+ax.set_xlabel('frequency (Hz)')
+ax.set_ylabel(r'PSD ($V/sqrt(Hz)$)')
+ax.set_xlim(0, 2000)
+ax.set_title('Room 376 vs. EPS Background B Field Spectra')
+plt.show()
 
 if time_averaged:
     avgs = []
