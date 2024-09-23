@@ -111,19 +111,16 @@ elif norms_present == 0:
         # 4e-5 s/sample = 25 kHz
         fs = 25000
 
-        # Overlap = ~10%
-        noverlap = 0.1 * len(dataset['TIME'])
-
         # 0.5s segments --> 0.5s / (4e-5 s/sample) = nperseg
         nperseg = 0.5/(4e-5)
 
-        f, Pxx_den = signal.welch(dataset['Norm (B)'], fs=fs, nperseg=nperseg, noverlap=None)
+        # Overlap = 10%
+        noverlap = 0.1 * nperseg
 
-        if i == 0:
-            spectra.append(f)
-            spectra.append(np.sqrt(Pxx_den))
-        else:
-            spectra.append(np.sqrt(Pxx_den))
+        f, Pxx_den = signal.welch(dataset['Norm (B)'], fs=fs, nperseg=nperseg, noverlap=noverlap)
+
+        spectra.append(f)
+        spectra.append(np.sqrt(Pxx_den))
 
 else:
     print('Invalid norms_present value. Please enter 0, 1, or 2.')
@@ -133,17 +130,21 @@ else:
 # Plot data
 fig, ax = plt.subplots()
 
+print(spectra[0], spectra[2], spectra[4], spectra[6], spectra[8])
+
 # Plot spectra
-ax.plot(spectra[0], spectra[1], color=bar_colors[0], linestyle='-', label='lightsOff1209')
-ax.plot(spectra[0], spectra[2], color=bar_colors[1], linestyle='-', label='lightsOn1209')
-ax.plot(spectra[0], spectra[3], color=bar_colors[2], linestyle='-', label='lightsOff376')
-ax.plot(spectra[0], spectra[4], color=bar_colors[3], linestyle='-', label='376poweroff')
-ax.plot(spectra[0], spectra[5], color=bar_colors[4], linestyle='-', label='lightsOn376')
+ax.plot(spectra[0], spectra[1], color=bar_colors[0], alpha=0.6, linestyle='-', label='lightsOff1209')
+ax.plot(spectra[2], spectra[3], color=bar_colors[1], alpha=0.6, linestyle='-', label='lightsOn1209')
+ax.plot(spectra[4], spectra[5], color=bar_colors[2], alpha=0.6, linestyle='-', label='lightsOff376')
+ax.plot(spectra[6], spectra[7], color=bar_colors[3], alpha=0.6, linestyle='-', label='376poweroff')
+ax.plot(spectra[8], spectra[9], color=bar_colors[4], alpha=0.6, linestyle='-', label='lightsOn376')
 
 ax.legend()
+ax.set_xscale('log')
+ax.set_yscale('log')
 ax.set_xlabel('frequency (Hz)')
 ax.set_ylabel(r'PSD ($V/sqrt(Hz)$)')
-ax.set_xlim(0, 2000)
+ax.set_xlim(2, 2000)
 ax.set_title('Room 376 vs. EPS Background B Field Spectra')
 plt.show()
 
